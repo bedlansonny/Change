@@ -5,6 +5,8 @@ public class Change
 {
     static int[] v;     //coin values
     static int[][] s;   //smallest amount of coins given [coin index of v][total desired amount]
+    static TreeMap<Integer, Integer> amounts;
+
     public static void main(String args[]) throws IOException
     {
         Scanner in = new Scanner(new File("change.dat"));
@@ -22,10 +24,50 @@ public class Change
             }
 
             s = new int[coins][t+1];
-
             System.out.println(smallest());
+
+            for(int y = 0; y < s.length; y++)
+            {
+                for (int x = 0; x < s[0].length; x++)
+                {
+                    System.out.printf("%2s, ", "" + s[y][x]);
+                }
+                System.out.println();
+            }
+
+
+            amounts = new TreeMap<>();
+            trace(s.length-1, s[0].length-1);
+            System.out.println(amounts.toString());
+            System.out.println();
+
         }
     }
+
+    //recursive, traces which coins produced the smallest amount of coins to reach the target amount
+    static void trace(int c, int t)
+    {
+        if(c == 0)
+        {
+            if(!amounts.containsKey(v[c]))
+                amounts.put(v[c], s[c][t]);
+            else
+                amounts.put(v[c], amounts.get(v[c]) + s[c][t]);
+        }
+        else if(s[c-1][t] == s[c][t])
+        {
+            trace(c-1, t);
+        }
+        else
+        {
+            if(!amounts.containsKey(v[c]))
+                amounts.put(v[c], 1);
+            else
+                amounts.put(v[c], amounts.get(v[c]) + 1);
+            trace(c, t - v[c]);
+        }
+    }
+
 
     //DP, returns smallest amount of coins to reach the target amount, returns -1 if impossible
     static int smallest()
