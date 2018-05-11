@@ -49,10 +49,14 @@ public class Change
     {
         if(c == 0)
         {
-            if(!amounts.containsKey(v[c]))
-                amounts.put(v[c], s[c][t]);
-            else
-                amounts.put(v[c], amounts.get(v[c]) + s[c][t]);
+            if(s[c][t] != 0)
+            {
+                if(!amounts.containsKey(v[c]))
+                    amounts.put(v[c], s[c][t]);
+                else
+                    amounts.put(v[c], amounts.get(v[c]) + s[c][t]);
+            }
+
         }
         else if(s[c-1][t] == s[c][t])
         {
