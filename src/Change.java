@@ -5,7 +5,7 @@ public class Change
 {
     static int[] v;     //coin values
     static int[][] s;   //smallest amount of coins given [coin index of v][total desired amount]
-    static TreeMap<Integer, Integer> amounts;
+    static int[] amounts;
 
     public static void main(String args[]) throws IOException
     {
@@ -14,7 +14,6 @@ public class Change
         int cases = in.nextInt();
         for(int casesI = 0; casesI < cases; casesI++)
         {
-            int t = in.nextInt();
             int coins = in.nextInt();
 
             v = new int[coins];
@@ -23,24 +22,27 @@ public class Change
                 v[coinsI] = in.nextInt();
             }
 
+            int t = in.nextInt();
+
             s = new int[coins][t+1];
-            System.out.println(smallest());
 
-            for(int y = 0; y < s.length; y++)
-            {
-                for (int x = 0; x < s[0].length; x++)
-                {
-                    System.out.printf("%2s, ", "" + s[y][x]);
+            //DP
+//            System.out.print(smallest() + " ");
+
+            //Recursive Memoization (top-down)
+            for (int y = 0; y < s.length; y++) {
+                for (int x = 0; x < s[0].length; x++) {
+                    s[y][x] = -1;
                 }
-                System.out.println();
             }
+            System.out.print(smallestR(s.length-1, s[0].length-1) + " ");
 
-
-            amounts = new TreeMap<>();
+            amounts = new int[v.length];
             trace(s.length-1, s[0].length-1);
-            System.out.println(amounts.toString());
+            for (int i = 0; i < amounts.length; i++) {
+                System.out.print(amounts[i] + " ");
+            }
             System.out.println();
-
         }
     }
 
@@ -51,10 +53,7 @@ public class Change
         {
             if(s[c][t] != 0)
             {
-                if(!amounts.containsKey(v[c]))
-                    amounts.put(v[c], s[c][t]);
-                else
-                    amounts.put(v[c], amounts.get(v[c]) + s[c][t]);
+                amounts[c] += s[c][t];
             }
 
         }
@@ -64,10 +63,7 @@ public class Change
         }
         else
         {
-            if(!amounts.containsKey(v[c]))
-                amounts.put(v[c], 1);
-            else
-                amounts.put(v[c], amounts.get(v[c]) + 1);
+            amounts[c]++;
             trace(c, t - v[c]);
         }
     }
@@ -102,5 +98,28 @@ public class Change
             return -1;
         else
             return s[s.length-1][s[0].length-1];
+    }
+
+    //same as DP method but uses top-down memoized recursion
+    static int smallestR(int c, int t)
+    {
+        if(s[c][t] == -1)
+        {
+            if(c == 0)
+            {
+                if(t % v[0] != 0)
+                    s[c][t] = Integer.MAX_VALUE;
+                else
+                    s[c][t] = t / v[0];
+            }
+            else
+            {
+                if(t < v[c])
+                    s[c][t] = smallestR(c-1, t);
+                else
+                    s[c][t] = Math.min(smallestR(c, t-v[c]) + 1, smallestR(c-1, t));
+            }
+        }
+        return s[c][t];
     }
 }
